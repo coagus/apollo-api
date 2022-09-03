@@ -1,73 +1,68 @@
-# apollo-api / 03 Webpack
+# apollo-api / 03 Apollo Server
 Apollo API
 ## Get starter
+Add modules
+```console
+yarn add graphql apollo-server
+```
 Add developer modules
 ```console
-yarn add -D ts-node ts-loader webpack webpack-cli webpack-node-externals @types/node
+yarn add -D nodemon
 ```
-Create webpack.config.js
-```javascript
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
 
-module.exports = {
-    mode: 'production',
-    entry: './src/index.ts',
-    output: {
-        filename: 'index.js',
-        path: path.resolve(__dirname, 'dist'),
-    },
-    resolve: {
-        extensions: ['.ts', '.js'],
-    },
-    module: {
-        rules: [
-            {
-                test: /\.ts/,
-                use: 'ts-loader',
-                include: [path.resolve(__dirname, 'src')],
-            },
-        ]
-    },
-    externals: [ nodeExternals() ],
-}
-```
-Add script in package.json with command start and build
+Add script in package.json with command dev
 ```json
 {
  ...
   "scripts": {
-    "start": "node ./dist/index.js",
-    "build": "webpack"
+    *...*
+    "dev": "nodemon ./src/index.ts"
   },
   ...
 }
 ```
 Create src/index.ts
 ```javascript
-const msg: string = "Hello World!";
-console.log(msg);
-```
-Build project with Yarn
-```console
-$ yarn build
-yarn run v1.22.19
-$ webpack
-asset index.js 51 bytes [emitted] [minimized] (name: main)
-./src/index.ts 63 bytes [built] [code generated]
-webpack 5.74.0 compiled successfully in 1744 ms
-Done in 3.05s.
-```
-Start project with Yarn
-```console
-$ yarn start
-yarn run v1.22.19
-$ node ./dist/index.js
-Hello World!
-Done in 0.33s.
-```
+import { ApolloServer } from "apollo-server";
 
-*dist/index.js*
-```javascript
-(()=>{"use strict";console.log("Hello World!")})();
+const msg: string = "Hello World!";
+
+// QUERY
+const typeDefs = `
+    type Query {
+        message: String!
+    }
+`;
+
+// RESOLVERS
+const resolvers = {
+  Query: {
+    message: () => msg,
+  },
+};
+
+// APOLLO SERVER
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+server.listen().then(({ url }) => console.log(`Server is running on ${url}`));
 ```
+Run dev project with Yarn
+```bash
+$ yarn dev
+yarn run v1.22.19
+$ nodemon ./src/index.ts
+[nodemon] 2.0.19
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: ts,json
+[nodemon] starting `ts-node ./src/index.ts`
+Server is running on http://localhost:4000/
+```
+![user table](resource/img/apollo.png?raw=true)
+
+Click in **Query your server**
+
+![user table](resource/img/sandbox_explorer.png?raw=true)
